@@ -1,24 +1,32 @@
 use crate::schema::*;
-use crate::user::util::{make_hash, make_salt};
 use chrono::*;
-use shrinkwraprs::Shrinkwrap;
-use uuid::Uuid;
+use bigdecimal::BigDecimal;
 
-#[derive(Debug, Serialize, Deserialize, Queryable, juniper::GraphQLObject)]
-pub struct User {
-    pub user_id: i32,
-    pub user_uuid: Uuid,
-    #[graphql(skip)]
+#[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
+#[table_name = "headers"]
+pub struct Header {
+    pub chain_type: i16,
+    pub height: BigDecimal,
+    pub version: i16,
+    pub fork: i16,
     pub hash: Vec<u8>,
-    #[graphql(skip)]
-    pub salt: String,
-    pub email: String,
-    pub role: String,
-    pub name: String,
-    pub created_at: NaiveDateTime,
+    pub kernel_mmr_size: BigDecimal,
+    pub kernel_root: Vec<u8>,
+    pub output_mmr_size: BigDecimal,
+    pub output_root: Vec<u8>,
+    pub prev_root: Vec<u8>,
+    pub previous: Vec<u8>,
+    pub range_proof_root: Vec<u8>,
+    pub total_kernel_offset: Vec<u8>,
+    pub timestamp_utc: NaiveDateTime,
+    pub edge_bits: i16,
+    pub total_difficulty: BigDecimal,
+    pub nonce: BigDecimal,
+    pub secondary_scaling: i64,
+    pub cuckoo_solution: Vec<Vec<u8>>
 }
 
-#[derive(Debug, Insertable)]
+/*#[derive(Debug, Insertable)]
 #[table_name = "users"]
 pub struct InsertableUser {
     pub user_uuid: Uuid,
@@ -91,3 +99,4 @@ impl From<User> for SlimUser {
         }
     }
 }
+*/

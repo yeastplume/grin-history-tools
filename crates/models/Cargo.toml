@@ -1,0 +1,18 @@
+[package]
+name = "grin-history-tools-models"
+version = "0.1.0"
+authors = ["Yeastplume <yeastplume@gmail.com>"]
+
+edition = "2018"
+
+[dependencies]
+bigdecimal = { version = "0.1.2", features = ["serde"] }
+diesel = { version = "1.4.7", features = ["postgres", "uuidv07", "chrono", "r2d2", "numeric"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+#log = "0.4.8"
+#env_logger ="0.7.1"
+
+serde = "1.0"
+serde_derive = "1.0"
+#serde_json = "1.0"
