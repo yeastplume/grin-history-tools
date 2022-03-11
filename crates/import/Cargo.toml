@@ -8,9 +8,10 @@ edition = "2018"
 [dependencies]
 grin-history-tools-models = { path = "../../crates/models", version = "0.1.0"}
 grin_api = { path = "../../../grin-yeastplume/api", version = "5.2.0-alpha.1" }
+grin_core = { path = "../../../grin-yeastplume/core", version = "5.2.0-alpha.1" }
 
 #bigdecimal = { version = "0.1.2", features = ["serde"] }
-#diesel = { version = "1.4.7", features = ["postgres", "uuidv07", "chrono", "r2d2", "numeric"] }
+diesel = { version = "1.4.7", features = ["postgres", "uuidv07", "chrono", "r2d2", "numeric"] }
 #chrono = { version = "0.4", features = ["serde"] }
 dotenv = "0.15"
 
@@ -22,3 +23,5 @@ thiserror = "1.0"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
+
+structopt = "0.3"
