@@ -7,6 +7,8 @@ edition = "2018"
 
 [dependencies]
 grin_api = { path = "../../../grin-yeastplume/api", version = "5.2.0-alpha.1" }
+grin_util = { path = "../../../grin-yeastplume/util", version = "5.2.0-alpha.1" }
+grin_core = { path = "../../../grin-yeastplume/core", version = "5.2.0-alpha.1" }
 
 bigdecimal = { version = "0.1.2", features = ["serde"] }
 diesel = { version = "1.4.7", features = ["postgres", "uuidv07", "chrono", "r2d2", "numeric"] }
@@ -14,6 +16,8 @@ chrono = { version = "0.4", features = ["serde"] }
 
 #log = "0.4.8"
 #env_logger ="0.7.1"
+
+thiserror = "1.0"
 
 serde = "1.0"
 serde_derive = "1.0"

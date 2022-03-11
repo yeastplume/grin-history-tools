@@ -1283,8 +1283,11 @@ dependencies = [
  "chrono",
  "diesel",
  "grin_api",
+ "grin_core",
+ "grin_util",
  "serde",
  "serde_derive",
+ "thiserror",
 ]
 
 [[package]]
