@@ -6,6 +6,8 @@ authors = ["Yeastplume <yeastplume@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+grin_api = { path = "../../../grin-yeastplume/api", version = "5.2.0-alpha.1" }
+
 bigdecimal = { version = "0.1.2", features = ["serde"] }
 diesel = { version = "1.4.7", features = ["postgres", "uuidv07", "chrono", "r2d2", "numeric"] }
 chrono = { version = "0.4", features = ["serde"] }

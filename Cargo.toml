@@ -2,5 +2,8 @@
 members = [
     "crates/models",
     "crates/web",
+    "crates/import",
 ]
-default-run = "web"
+default-members = ["crates/import"]
+
+
