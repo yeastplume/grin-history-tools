@@ -21,6 +21,14 @@ table! {
 }
 
 table! {
+    inputs (header_hash, output_header_hash, commit) {
+        header_hash -> Bytea,
+        output_header_hash -> Bytea,
+        commit -> Bytea,
+    }
+}
+
+table! {
     kernel_features (enum_id) {
         enum_id -> Int2,
         description -> Varchar,
@@ -36,35 +44,36 @@ table! {
         fee -> Numeric,
         fee_shift -> Int2,
         lock_height -> Nullable<Numeric>,
-        relative_height -> Nullable<Int8>,
     }
 }
 
 table! {
-    output_features (enum_id) {
+    output_types (enum_id) {
         enum_id -> Int2,
         description -> Varchar,
     }
 }
 
 table! {
-    outputs (output_header_hash, commit) {
-        output_header_hash -> Bytea,
-        input_header_hash -> Nullable<Bytea>,
+    outputs (header_hash, commit) {
+        header_hash -> Bytea,
         commit -> Bytea,
         output_type -> Nullable<Int2>,
         proof -> Bytea,
     }
 }
 
+joinable!(inputs -> headers (header_hash));
 joinable!(kernels -> headers (header_hash));
 joinable!(kernels -> kernel_features (features));
-joinable!(outputs -> output_features (output_type));
+joinable!(outputs -> headers (header_hash));
+joinable!(outputs -> output_types (output_type));
 
 allow_tables_to_appear_in_same_query!(
     headers,
+    inputs,
     kernel_features,
     kernels,
-    output_features,
+    output_types,
     outputs,
 );

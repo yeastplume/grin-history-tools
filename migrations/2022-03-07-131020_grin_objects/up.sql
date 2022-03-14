@@ -35,6 +35,7 @@ insert into kernel_features (enum_id, description) VALUES
     (3, 'NoRecentDuplicate');
 
 -- Kernels
+-- NRD Kernel relative height is contained within lock_height
 create TABLE kernels (
     header_hash BYTEA references headers(hash) NOT NULL,
     excess BYTEA NOT NULL,
@@ -43,29 +44,45 @@ create TABLE kernels (
     fee NUMERIC(20) NOT NULL,
     fee_shift SMALLINT NOT NULL, -- TODO: is this ever not 0 at the moment?
     lock_height NUMERIC(20), -- Nullable in V2 protocol
-    relative_height BIGINT, -- u32, nullable in V2 protocol
     PRIMARY KEY(header_hash, excess)
 );
 
--- Output Features
-create TABLE output_features(
+CREATE INDEX kernels__excess_idx on kernels(excess);
+
+-- Output Types
+create TABLE output_types(
     enum_id SMALLINT PRIMARY KEY,
     description VARCHAR NOT NULL
 );
 
-insert into output_features (enum_id, description) VALUES 
-    (0, 'Plain'),
-    (1, 'Coinbase');
+insert into output_types (enum_id, description) VALUES 
+    (0, 'Coinbase'),
+    (1, 'Transaction');
  
 -- Outputs
 -- Leave out merkle proof and MMR indices for now
 -- 'proof_hash' can be derived from proof
--- 'spent' can be derived from whether input_header_hash exists
+-- 'spent' can be derived from whether input exists?
 create TABLE outputs (
-    output_header_hash BYTEA references headers(hash) NOT NULL, -- i.e, block in which this output was created
-    input_header_hash BYTEA references headers(hash), -- i.e. block in which this output was spent
+    header_hash BYTEA references headers(hash) NOT NULL, -- i.e, block in which this output was created
     commit BYTEA NOT NULL,
-    output_type SMALLINT references output_features(enum_id),
+    output_type SMALLINT references output_types(enum_id),
     proof BYTEA NOT NULL,
-    PRIMARY KEY(output_header_hash, commit)
+    PRIMARY KEY(header_hash, commit)
 );
+
+CREATE INDEX outputs__commit_idx on outputs(commit);
+
+-- Inputs
+-- Simply a reference to the original output and the block in which it was spent
+-- (Forks should be handled in this manner)
+
+create TABLE inputs (
+   header_hash BYTEA references headers(hash) NOT NULL,
+   output_header_hash BYTEA NOT NULL,
+   commit BYTEA NOT NULL,
+   FOREIGN KEY(output_header_hash, commit) REFERENCES outputs(header_hash, commit),
+   PRIMARY KEY(header_hash, output_header_hash, commit)
+);
+
+CREATE INDEX inputs__commit_idx on inputs(commit);
