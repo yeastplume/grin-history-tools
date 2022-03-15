@@ -1,24 +1,17 @@
 use grin_api::{client, json_rpc::*};
-use grin_history_tools_models::block::BlockHeaderPrintable;
+use grin_history_tools_models::block::{BlockPrintable, BlockHeaderPrintable, Tip};
 
 use serde_json::json;
-use thiserror::Error;
+use crate::client::HttpClientError;
 
 const ENDPOINT: &str = "/v2/foreign";
-
-/// Error type wrapping underlying module errors.
-#[derive(Error, Debug)]
-pub enum HttpClientError {
-	/// RPC Error
-    #[error("{0}")]
-	RPCError(String),
-}
 
 #[derive(Clone)]
 pub struct HTTPNodeClient {
 	node_url: String,
 	node_api_secret: Option<String>,
 }
+
 impl HTTPNodeClient {
 	/// Create a new client that will communicate with the given grin node
 	pub fn new(node_url: &str, node_api_secret: Option<String>) -> HTTPNodeClient {
@@ -67,5 +60,15 @@ impl HTTPNodeClient {
     pub fn get_header(&self, height: u64) -> Result<BlockHeaderPrintable, HttpClientError> {
 		let params = json!([height, null, null]);
 		self.send_json_request::<BlockHeaderPrintable>("get_header", &params)
+	}
+
+    pub fn get_block(&self, height: u64) -> Result<BlockPrintable, HttpClientError> {
+		let params = json!([height, null, null]);
+		self.send_json_request::<BlockPrintable>("get_block", &params)
+	}
+
+    pub fn get_tip(&self) -> Result<Tip, HttpClientError> {
+		let params = json!([]);
+		self.send_json_request::<Tip>("get_tip", &params)
 	}
 }

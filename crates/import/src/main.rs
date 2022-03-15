@@ -9,11 +9,12 @@ mod cli_args;
 use grin_core::global;
 
 use crate::database::db_connection;
-use crate::client::HTTPNodeClient;
-use crate::service::block;
+use crate::client::{HTTPNodeClient, HttpClientError};
+use crate::service::{block, DbError};
+use thiserror::Error;
 
 
-fn main() {
+fn main() -> Result<(), GrinImportError> {
     dotenv::dotenv().ok();
     env_logger::init();
 
@@ -26,15 +27,52 @@ fn main() {
     let pool = database::pool::establish_connection(opt.clone());
 
 	global::set_local_chain_type(global::ChainTypes::Mainnet);
-
-    //let transport = Builder::new().url("http://localhost:13415/foreign");
     let node_url = "127.0.0.1:3413";
     let client = HTTPNodeClient::new(node_url, None);
-    let res = client.get_header(1161601);
+    let conn = db_connection(&pool).unwrap();
+
+    let tip = client.get_tip()?;
+    info!("Tip is {}", tip.height);
+
+    let to_height = tip.height;
+
+    for n in 600000..to_height {
+    //for n in 553150..553151 {
+        let block_res = client.get_block(n);
+        if let Ok(r) = block_res {
+            block::add_block(&conn, r)?;
+        }
+        if n % 10000 == 0 {
+            info!("Added {} blocks", n);
+        }
+    }
+
+    /*let res = client.get_block(1161602);
     println!("RES FROM NODE IS {:?}", res);
 
-    let conn = db_connection(&pool).unwrap();
-    let res = block::create_header(&conn, res.unwrap());
-    println!("RES FROM DB IS {:?}", res);
+    let res = block::add_block(&conn, res.unwrap());
+    println!("RES FROM DB IS {:?}", res);*/
+    Ok(())
+}
 
+#[derive(Error, Debug)]
+pub enum GrinImportError {
+	/// RPC Error
+    #[error("{0}")]
+	HttpClientError(HttpClientError),
+	/// DbError
+    #[error("{0}")]
+	DbError(DbError),
+}
+
+impl From<HttpClientError> for GrinImportError {
+    fn from(e: HttpClientError) -> Self {
+        GrinImportError::HttpClientError(e)
+    }
+}
+
+impl From<DbError> for GrinImportError {
+    fn from(e: DbError) -> Self {
+        GrinImportError::DbError(e)
+    }
 }

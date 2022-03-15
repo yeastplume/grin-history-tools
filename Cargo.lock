@@ -1270,6 +1270,7 @@ dependencies = [
  "grin-history-tools-models",
  "grin_api",
  "grin_core",
+ "grin_util",
  "log",
  "serde",
  "serde_derive",

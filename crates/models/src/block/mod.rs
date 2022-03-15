@@ -1,2 +1,4 @@
 pub mod model;
-pub use grin_api::types::{BlockHeaderPrintable, TxKernelPrintable, OutputPrintable, OutputType};
+pub use grin_api::types::{
+    BlockHeaderPrintable, BlockPrintable, OutputPrintable, OutputType, TxKernelPrintable, Tip
+};

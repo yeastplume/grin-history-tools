@@ -43,7 +43,7 @@ create TABLE kernels (
     features SMALLINT references kernel_features(enum_id) NOT NULL,
     fee NUMERIC(20) NOT NULL,
     fee_shift SMALLINT NOT NULL, -- TODO: is this ever not 0 at the moment?
-    lock_height NUMERIC(20), -- Nullable in V2 protocol
+    lock_height NUMERIC(20) NOT NULL, -- Nullable in V2 protocol
     PRIMARY KEY(header_hash, excess)
 );
 
@@ -66,7 +66,7 @@ insert into output_types (enum_id, description) VALUES
 create TABLE outputs (
     header_hash BYTEA references headers(hash) NOT NULL, -- i.e, block in which this output was created
     commit BYTEA NOT NULL,
-    output_type SMALLINT references output_types(enum_id),
+    output_type SMALLINT references output_types(enum_id) NOT NULL,
     proof BYTEA NOT NULL,
     PRIMARY KEY(header_hash, commit)
 );

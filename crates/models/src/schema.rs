@@ -43,7 +43,7 @@ table! {
         features -> Int2,
         fee -> Numeric,
         fee_shift -> Int2,
-        lock_height -> Nullable<Numeric>,
+        lock_height -> Numeric,
     }
 }
 
@@ -58,7 +58,7 @@ table! {
     outputs (header_hash, commit) {
         header_hash -> Bytea,
         commit -> Bytea,
-        output_type -> Nullable<Int2>,
+        output_type -> Int2,
         proof -> Bytea,
     }
 }
