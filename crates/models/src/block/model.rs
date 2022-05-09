@@ -11,9 +11,9 @@ use std::io::Cursor;
 
 use crate::block::{BlockHeaderPrintable, OutputPrintable, OutputType, TxKernelPrintable};
 
-#[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "headers"]
-pub struct BlockHeaderDb {
+pub struct BlockHeaderDbInsertable {
     pub hash: Vec<u8>,
     pub version: i16,
     pub height: BigDecimal,
@@ -33,11 +33,35 @@ pub struct BlockHeaderDb {
     pub total_kernel_offset: Vec<u8>,
 }
 
-impl TryFrom<BlockHeaderPrintable> for BlockHeaderDb {
+
+#[derive(Debug, Associations, Serialize, Deserialize, Queryable)]
+#[table_name = "headers"]
+pub struct BlockHeaderDbQueryable {
+    pub id: i32,
+    pub hash: Vec<u8>,
+    pub version: i16,
+    pub height: BigDecimal,
+    pub previous: Vec<u8>,
+    pub prev_root: Vec<u8>,
+    pub timestamp_utc: NaiveDateTime,
+    pub output_root: Vec<u8>,
+    pub output_mmr_size: BigDecimal,
+    pub range_proof_root: Vec<u8>,
+    pub kernel_root: Vec<u8>,
+    pub kernel_mmr_size: BigDecimal,
+    pub nonce: BigDecimal,
+    pub edge_bits: i16,
+    pub cuckoo_solution: Vec<u8>,
+    pub total_difficulty: BigDecimal,
+    pub secondary_scaling: i64,
+    pub total_kernel_offset: Vec<u8>,
+}
+
+impl TryFrom<BlockHeaderPrintable> for BlockHeaderDbInsertable {
     type Error = ModelError;
 
     fn try_from(hp: BlockHeaderPrintable) -> Result<Self, Self::Error> {
-        Ok(BlockHeaderDb {
+        Ok(BlockHeaderDbInsertable {
             hash: from_hex(&hp.hash)?,
             version: hp.version as i16,
             height: BigDecimal::from(hp.height),
@@ -63,10 +87,10 @@ impl TryFrom<BlockHeaderPrintable> for BlockHeaderDb {
     }
 }
 
-impl TryFrom<BlockHeaderDb> for BlockHeaderPrintable {
+impl TryFrom<BlockHeaderDbQueryable> for BlockHeaderPrintable {
     type Error = ModelError;
 
-    fn try_from(h_db: BlockHeaderDb) -> Result<Self, Self::Error> {
+    fn try_from(h_db: BlockHeaderDbQueryable) -> Result<Self, Self::Error> {
         // Parse cuckoo solution
         let mut buf = Cursor::new(h_db.cuckoo_solution);
         let mut r = BinReader::new(
@@ -125,11 +149,10 @@ impl TryFrom<BlockHeaderDb> for BlockHeaderPrintable {
     }
 }
 
-#[derive(Debug, Associations, Serialize, Deserialize, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "kernels"]
-#[belongs_to(BlockHeaderDb, foreign_key = "header_hash")]
-pub struct KernelDb {
-    pub header_hash: Vec<u8>,
+pub struct KernelDbInsertable {
+    pub header_id: i32,
     pub excess: Vec<u8>,
     pub excess_sig: Vec<u8>,
     pub features: i16,
@@ -137,6 +160,21 @@ pub struct KernelDb {
     pub fee_shift: i16,
     pub lock_height: BigDecimal,
 }
+
+#[derive(Debug, Associations, Serialize, Deserialize, Queryable)]
+#[table_name = "kernels"]
+#[belongs_to(BlockHeaderDbQueryable, foreign_key = "header_id")]
+pub struct KernelDbQueryable {
+    pub id: i32,
+    pub header_id: i32,
+    pub excess: Vec<u8>,
+    pub excess_sig: Vec<u8>,
+    pub features: i16,
+    pub fee: BigDecimal,
+    pub fee_shift: i16,
+    pub lock_height: BigDecimal,
+}
+
 
 fn to_kernel_feature_string(value: i16) -> String {
     match value {
@@ -158,12 +196,12 @@ fn from_kernel_feature_string(value: &str) -> i16 {
     }
 }
 
-impl TryFrom<TxKernelPrintable> for KernelDb {
+impl TryFrom<TxKernelPrintable> for KernelDbInsertable {
     type Error = ModelError;
 
     fn try_from(kp: TxKernelPrintable) -> Result<Self, Self::Error> {
-        Ok(KernelDb {
-            header_hash: from_hex("")?, // Note this needs to be filled in manually before insertion
+        Ok(KernelDbInsertable {
+            header_id: 0, // Note this needs to be filled in manually before insertion
             excess: from_hex(&kp.excess)?,
             excess_sig: from_hex(&kp.excess_sig)?,
             features: from_kernel_feature_string(&kp.features),
@@ -174,10 +212,10 @@ impl TryFrom<TxKernelPrintable> for KernelDb {
     }
 }
 
-impl TryFrom<KernelDb> for TxKernelPrintable {
+impl TryFrom<KernelDbQueryable> for TxKernelPrintable {
     type Error = ModelError;
 
-    fn try_from(k_db: KernelDb) -> Result<Self, Self::Error> {
+    fn try_from(k_db: KernelDbQueryable) -> Result<Self, Self::Error> {
         Ok(TxKernelPrintable {
             excess: k_db.excess.to_hex(),
             excess_sig: k_db.excess.to_hex(),
@@ -211,17 +249,28 @@ fn from_output_type(value: &OutputType) -> i16 {
     }
 }
 
-#[derive(Debug, Associations, Serialize, Deserialize, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "outputs"]
-#[belongs_to(BlockHeaderDb, foreign_key = "header_hash")]
-pub struct OutputDb {
-    pub header_hash: Vec<u8>,
+pub struct OutputDbInsertable {
+    pub header_id: i32,
     pub commit: Vec<u8>,
     pub output_type: i16,
     pub proof: Vec<u8>,
 }
 
-impl TryFrom<OutputPrintable> for OutputDb {
+
+#[derive(Debug, Associations, Serialize, Deserialize, Queryable)]
+#[table_name = "outputs"]
+#[belongs_to(BlockHeaderDbQueryable, foreign_key = "header_id")]
+pub struct OutputDbQueryable {
+    pub id: i32,
+    pub header_id: i32,
+    pub commit: Vec<u8>,
+    pub output_type: i16,
+    pub proof: Vec<u8>,
+}
+
+impl TryFrom<OutputPrintable> for OutputDbInsertable {
     type Error = ModelError;
 
     fn try_from(op: OutputPrintable) -> Result<Self, Self::Error> {
@@ -231,8 +280,8 @@ impl TryFrom<OutputPrintable> for OutputDb {
                 "proof must exist for output".to_string(),
             ))
         };
-        Ok(OutputDb {
-            header_hash: from_hex("")?, // Note this needs to be filled in manually before insertion
+        Ok(OutputDbInsertable {
+            header_id: 0, // Note this needs to be filled in manually before insertion
             commit: op.commit.0.to_vec(),
             output_type: from_output_type(&op.output_type),
             proof: from_hex(&proof)?,
@@ -265,14 +314,22 @@ impl TryFrom<OutputPrintable> for OutputDb {
 
 // No conversions here as these require references to existing outputs
 
-#[derive(Debug, Associations, Serialize, Deserialize, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "inputs"]
-#[belongs_to(BlockHeaderDb, foreign_key = "header_hash")]
-pub struct InputDb {
-    pub header_hash: Vec<u8>,
-    pub output_header_hash: Vec<u8>,
-    pub commit: Vec<u8>,
+pub struct InputDbInsertable {
+    pub header_id: i32,
+    pub output_id: i32,
 }
+
+#[derive(Debug, Associations, Serialize, Deserialize, Queryable)]
+#[table_name = "inputs"]
+#[belongs_to(BlockHeaderDbQueryable, foreign_key = "header_id")]
+pub struct InputDbQueryable {
+    pub id: i32,
+    pub header_id: i32,
+    pub output_id: i32,
+}
+
 
 #[derive(Error, Debug)]
 pub enum ModelError {

@@ -1,5 +1,6 @@
 table! {
-    headers (hash) {
+    headers (id) {
+        id -> Int4,
         hash -> Bytea,
         version -> Int2,
         height -> Numeric,
@@ -21,10 +22,10 @@ table! {
 }
 
 table! {
-    inputs (header_hash, output_header_hash, commit) {
-        header_hash -> Bytea,
-        output_header_hash -> Bytea,
-        commit -> Bytea,
+    inputs (id) {
+        id -> Int4,
+        header_id -> Int4,
+        output_id -> Int4,
     }
 }
 
@@ -36,8 +37,9 @@ table! {
 }
 
 table! {
-    kernels (header_hash, excess) {
-        header_hash -> Bytea,
+    kernels (id) {
+        id -> Int4,
+        header_id -> Int4,
         excess -> Bytea,
         excess_sig -> Bytea,
         features -> Int2,
@@ -55,18 +57,20 @@ table! {
 }
 
 table! {
-    outputs (header_hash, commit) {
-        header_hash -> Bytea,
+    outputs (id) {
+        id -> Int4,
+        header_id -> Int4,
         commit -> Bytea,
         output_type -> Int2,
         proof -> Bytea,
     }
 }
 
-joinable!(inputs -> headers (header_hash));
-joinable!(kernels -> headers (header_hash));
+joinable!(inputs -> headers (header_id));
+joinable!(inputs -> outputs (output_id));
+joinable!(kernels -> headers (header_id));
 joinable!(kernels -> kernel_features (features));
-joinable!(outputs -> headers (header_hash));
+joinable!(outputs -> headers (header_id));
 joinable!(outputs -> output_types (output_type));
 
 allow_tables_to_appear_in_same_query!(
