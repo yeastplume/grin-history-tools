@@ -36,11 +36,12 @@ fn main() -> Result<(), GrinImportError> {
 
     let to_height = tip.height;
 
-    for n in 600000..to_height {
+    //for n in 0..=to_height {
+    for n in 438052..=to_height {
     //for n in 553150..553151 {
         let block_res = client.get_block(n);
         if let Ok(r) = block_res {
-            block::add_block(&conn, r)?;
+            block::add_block(&conn, r);
         }
         if n % 10000 == 0 {
             info!("Added {} blocks", n);

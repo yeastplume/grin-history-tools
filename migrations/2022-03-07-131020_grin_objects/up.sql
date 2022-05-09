@@ -1,4 +1,5 @@
 -- Grin block + UTXO Schema
+-- For explorers, archivers or any other application that might require a queryable DB
 -- Notes: 
 --
 -- * Primary identifiers are signed 32 bit integers for cloudy space reasons, which means
