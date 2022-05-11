@@ -4,4 +4,5 @@ extern crate diesel;
 extern crate serde_derive;
 
 pub mod block;
+pub mod seedcheck;
 pub mod schema;

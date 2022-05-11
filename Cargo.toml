@@ -3,7 +3,8 @@ members = [
     "crates/models",
     "crates/web",
     "crates/import",
+    "crates/seedcheck",
 ]
-default-members = ["crates/import"]
+default-members = ["crates/seedcheck"]
 
 

@@ -66,6 +66,14 @@ table! {
     }
 }
 
+table! {
+    seed_check_results (id) {
+        id -> Int4,
+        created_at -> Timestamp,
+        results -> Jsonb,
+    }
+}
+
 joinable!(inputs -> headers (header_id));
 joinable!(inputs -> outputs (output_id));
 joinable!(kernels -> headers (header_id));
@@ -80,4 +88,5 @@ allow_tables_to_appear_in_same_query!(
     kernels,
     output_types,
     outputs,
+    seed_check_results,
 );
