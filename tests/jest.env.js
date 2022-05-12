@@ -2,7 +2,7 @@
 
 require('dotenv').config({ path: '.env' });
 const knex = require('knex');
-const NodeEnvironment = require('jest-environment-node');
+const NodeEnvironment = require('jest-environment-node').default;
 
 class CustomEnvironment extends NodeEnvironment {
   constructor(config, context) {
