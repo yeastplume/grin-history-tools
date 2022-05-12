@@ -5,7 +5,7 @@
     "lint": "nopenv pre-commit run --all-files",
     "test": "cross-env NODE_ENV=test jest",
     "testci": "cross-env RUST_LOG=debug DEBUG=canduma:* NODE_ENV=test jest",
-    "install": "npip install"
+    "install": ""
   },
   "husky": {
     "hooks": {
@@ -49,7 +49,6 @@
     "superagent": "^7.1.3",
     "supertest": "^6.2.3"
   },
-  "dependencies": {},
   "jest": {
     "setupFilesAfterEnv": [
       "jasmine-expect",
