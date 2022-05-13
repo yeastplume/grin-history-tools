@@ -15,7 +15,5 @@ describe("device/", () => {
 
   test("/seedcheck - Return seed check JSON", async () => {
     const result = await td.get_healthcheck_data(0);
-    console.log(result);
-    //expect(result).toBe("peanut butter");
   });
 });

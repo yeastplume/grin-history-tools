@@ -25,7 +25,8 @@ let get_healthcheck_data = async function (agentId, address) {
       .expect(HttpStatus.OK)
       .then(({ body }) => {
         debug("/block body=%o", body);
-        //expect(body.email).toBe(emails[agentId]);
+        expect(body).toHaveProperty('created_at');
+        expect(body).toHaveProperty('results');
         resolve(body);
       });
   });

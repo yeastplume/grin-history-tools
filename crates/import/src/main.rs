@@ -41,7 +41,10 @@ fn main() -> Result<(), GrinImportError> {
     //for n in 553150..553151 {
         let block_res = client.get_block(n);
         if let Ok(r) = block_res {
-            block::add_block(&conn, r);
+            let res = block::add_block(&conn, r);
+            if let Err(r) = res {
+                error!("Error importing block at {}: {}", n, r);
+            }
         }
         if n % 10000 == 0 {
             info!("Added {} blocks", n);

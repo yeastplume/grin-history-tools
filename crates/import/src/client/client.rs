@@ -57,7 +57,7 @@ impl HTTPNodeClient {
 		}
 	}
 
-    pub fn get_header(&self, height: u64) -> Result<BlockHeaderPrintable, HttpClientError> {
+    pub fn _get_header(&self, height: u64) -> Result<BlockHeaderPrintable, HttpClientError> {
 		let params = json!([height, null, null]);
 		self.send_json_request::<BlockHeaderPrintable>("get_header", &params)
 	}
