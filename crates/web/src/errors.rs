@@ -13,6 +13,9 @@ pub enum ServiceError {
 
     #[error("Unable to connect to DB")]
     UnableToConnectToDb,
+
+    #[error("Not found: {0}")]
+    NotFound(String),
 }
 
 // impl ResponseError trait allows to convert our errors into http responses with appropriate data
@@ -25,6 +28,9 @@ impl ResponseError for ServiceError {
             ServiceError::UnableToConnectToDb => HttpResponse::InternalServerError()
                 .json("Unable to connect to DB, Please try later"),
             ServiceError::BadRequest(ref message) => HttpResponse::BadRequest().json(message),
+            ServiceError::NotFound(ref message) => {
+                HttpResponse::BadRequest().json(format!("NOT_FOUND: {}", message))
+            }
         }
     }
 }
@@ -51,4 +57,4 @@ impl From<DBError> for ServiceError {
     }
 }
 
-//pub type ServiceResult<V> = std::result::Result<V, crate::errors::ServiceError>;
+pub type ServiceResult<V> = std::result::Result<V, crate::errors::ServiceError>;

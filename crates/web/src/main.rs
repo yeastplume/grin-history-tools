@@ -8,8 +8,10 @@ mod cli_args;
 mod database;
 mod errors;
 mod block;
+mod seedcheck;
+mod context;
 
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, web::Data};
 use actix_web::middleware::Logger;
 
 #[actix_web::main]
@@ -42,13 +44,14 @@ async fn main() -> std::io::Result<()> {
     let server = HttpServer::new(move || {
         App::new()
             // Database
-            .data(pool.clone())
+            .app_data(Data::new(pool.clone()))
             // Options
-            .data(opt.clone())
+            .app_data(Data::new(opt.clone()))
             // Error logging
             .wrap(Logger::default())
             // Sets routes via secondary files
             .configure(block::route)
+            .configure(seedcheck::route)
     })
     // Running at `format!("{}:{}",port,"0.0.0.0")`
     .bind(("0.0.0.0", port))

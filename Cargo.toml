@@ -5,6 +5,6 @@ members = [
     "crates/import",
     "crates/seedcheck",
 ]
-default-members = ["crates/seedcheck"]
+default-members = ["crates/web"]
 
 

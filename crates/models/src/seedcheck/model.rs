@@ -81,6 +81,22 @@ pub struct SeedCheckResultQueryable {
     pub results: SeedCheckResults,
 }
 
+#[derive(Debug, Serialize)]
+pub struct SeedCheckResponse {
+    pub created_at: NaiveDateTime,
+    pub results: SeedCheckResults,
+}
+
+impl From<SeedCheckResultQueryable> for SeedCheckResponse {
+    fn from(sq: SeedCheckResultQueryable) -> Self {
+        SeedCheckResponse {
+            created_at: sq.created_at,
+            results: sq.results,
+        }
+    }
+}
+
+
 
 
 

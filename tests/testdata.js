@@ -21,7 +21,7 @@ let agents = [
 let get_healthcheck_data = async function (agentId, address) {
   return new Promise((resolve) => {
     agents[agentId]
-      .get("/block")
+      .get("/seedcheck/latest")
       .expect(HttpStatus.OK)
       .then(({ body }) => {
         debug("/block body=%o", body);
