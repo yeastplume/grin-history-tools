@@ -66,6 +66,7 @@ pub fn check_seeds(is_testnet: bool) -> Vec<SeedCheckResult> {
         let resolved_dns_entries = resolve_dns_to_addrs(&vec![format!("{}:{}", s, port)]);
         if resolved_dns_entries.is_empty() {
             info!("FAIL - No dns entries found for {}", s);
+            result.push(seed_result);
             continue;
         }
         seed_result.dns_resolutions_found = true;
